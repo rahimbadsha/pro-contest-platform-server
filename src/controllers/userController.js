@@ -70,6 +70,16 @@ exports.updateProfile = async (req, res) => {
   }
 };
 
+// GET check if user has a submission for a contest
+exports.getMySubmission = async (req, res) => {
+  try {
+    const submission = await Submission.findOne({ contest: req.params.contestId, participant: req.userId });
+    res.json({ submission: submission || null });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
 // POST submit contest entry
 exports.submitContestEntry = async (req, res) => {
   try {
