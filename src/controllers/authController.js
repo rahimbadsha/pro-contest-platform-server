@@ -74,6 +74,48 @@ exports.login = async (req, res) => {
   }
 };
 
+// ------------------ GOOGLE AUTH (upsert) ------------------
+exports.googleAuth = async (req, res) => {
+  try {
+    const { email, name, photoUrl, uid } = req.body;
+    if (!email || !uid) return res.status(400).json({ message: 'email and uid required' });
+
+    const passwordHash = await bcrypt.hash(uid, 10);
+    let user = await User.findOne({ email });
+
+    if (user) {
+      user.passwordHash = passwordHash;
+      if (name && !user.name) user.name = name;
+      if (photoUrl && !user.photoUrl) user.photoUrl = photoUrl;
+      await user.save();
+    } else {
+      user = await User.create({
+        name: name || email,
+        email,
+        passwordHash,
+        photoUrl: photoUrl || '',
+      });
+    }
+
+    const accessToken = generateAccessToken(user);
+    const refreshToken = generateRefreshToken(user);
+
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'Strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    res.json({
+      accessToken,
+      user: { id: user._id, name: user.name, email: user.email, role: user.role, photoUrl: user.photoUrl },
+    });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
 // ------------------ REFRESH TOKEN ------------------
 exports.refreshToken = (req, res) => {
   try {
