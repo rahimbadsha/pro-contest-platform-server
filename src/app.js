@@ -16,7 +16,7 @@ try {
 
 const app = express();
 
-connectDB();
+connectDB().catch(console.error);
 
 app.use(cors({
   origin: [process.env.FRONTEND_URL || 'http://localhost:5173', process.env.CLIENT_URL || 'http://localhost:5173'],
@@ -42,5 +42,9 @@ app.use((err, req, res, next) => {
   res.status(500).json({ message: 'Internal server error' });
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+if (process.env.NODE_ENV !== 'production') {
+  const PORT = process.env.PORT || 3001;
+  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+}
+
+module.exports = app;
