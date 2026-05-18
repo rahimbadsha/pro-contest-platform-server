@@ -20,6 +20,17 @@ exports.getMyContests = async (req, res) => {
   }
 };
 
+// GET single contest by id (for edit form)
+exports.getMyContest = async (req, res) => {
+  try {
+    const contest = await Contest.findOne({ _id: req.params.id, creator: req.userId });
+    if (!contest) return res.status(404).json({ message: 'Contest not found' });
+    res.json({ contest });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
 // PATCH update own contest (only if pending/rejected, not approved)
 exports.updateContest = async (req, res) => {
   try {

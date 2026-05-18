@@ -3,6 +3,7 @@ const router = express.Router();
 const { verifyToken, authorizeRoles } = require('../middlewares/auth');
 const {
   getMyContests,
+  getMyContest,
   updateContest,
   deleteContest,
   getSubmissions,
@@ -13,6 +14,7 @@ const { createContest } = require('../controllers/contestController');
 const creatorAuth = [verifyToken, authorizeRoles('creator', 'admin')];
 
 router.get('/my-contests', ...creatorAuth, getMyContests);
+router.get('/contests/:id', ...creatorAuth, getMyContest);
 router.post('/contests', ...creatorAuth, createContest);
 router.patch('/contests/:id', ...creatorAuth, updateContest);
 router.delete('/contests/:id', ...creatorAuth, deleteContest);

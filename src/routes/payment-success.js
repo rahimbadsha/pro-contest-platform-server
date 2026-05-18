@@ -41,15 +41,14 @@ router.post('/', verifyToken, async (req, res) => {
       });
     }
 
-    // Increment contest participants if not already counted
-    if (!contest.participants.includes(userId)) {
+    // Increment contest participants if not already counted (safe ObjectId compare)
+    const alreadyCounted = contest.participants.some((p) => p.toString() === userId.toString());
+    if (!alreadyCounted) {
       contest.participants.push(userId);
       contest.participantsCount += 1;
       await contest.save();
+      await User.findByIdAndUpdate(userId, { $inc: { participated: 1 } });
     }
-
-    // Increment user participated count
-    await User.findByIdAndUpdate(userId, { $inc: { participated: 1 } });
 
     res.json({ message: 'Registration confirmed', submission });
   } catch (err) {

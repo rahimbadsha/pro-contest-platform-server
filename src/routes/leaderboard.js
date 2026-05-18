@@ -12,7 +12,7 @@ router.get('/', async (req, res) => {
 
     const [users, total] = await Promise.all([
       User.find({ wins: { $gt: 0 } })
-        .select('name email photoUrl wins participated')
+        .select('name photoUrl wins participated')
         .sort({ wins: -1 })
         .skip(skip)
         .limit(limit),
