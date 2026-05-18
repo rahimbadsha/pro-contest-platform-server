@@ -3,16 +3,6 @@ const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const connectDB = require('./config/db');
-const admin = require('firebase-admin');
-
-// Firebase Admin init
-try {
-  const serviceAccount = require('../firebase-service.json');
-  admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
-  console.log('Firebase Admin Initialized');
-} catch (e) {
-  console.warn('Firebase Admin init skipped:', e.message);
-}
 
 const app = express();
 
